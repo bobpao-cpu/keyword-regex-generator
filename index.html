@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>關鍵字語法生成器 (新手友善版)</title>
+  <style>
+    :root {
+      --bg-color: #FAF6E8;
+      --card-bg: #FFFFFF;
+      --panel-bg: #FAF8F2;
+      --border-color: #E6E1D6;
+      --text-main: #2C3036;
+      --text-muted: #7A7E85;
+      --primary: #2B4C7E;
+      --primary-hover: #1A3459;
+      --warm-yellow-bg: #FFFDF0;
+      --warm-yellow-border: #F3E8C9;
+      --warm-accent: #D97706;
+      --warm-accent-hover: #B45309;
+      --success: #28A745;
+      --success-bg: #E8F5E9;
+      --danger: #C04848;
+      --danger-bg: #FDF2F2;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 24px 16px;
+      color: var(--text-main);
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    /* 上方範例快速帶入區 */
+    .template-bar {
+      max-width: 1140px;
+      margin: 0 auto 16px auto;
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 12px 18px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .template-bar .title {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    .btn-template {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .btn-template:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px 22px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      margin: 12px 0 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--text-main);
+    }
+
+    .sub-hint {
+      font-weight: normal;
+      color: var(--text-muted);
+      font-size: 11.5px;
+    }
+
+    /* 輕量 Tooltip 提示圖示 */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      color: var(--warm-accent);
+      margin-left: 4px;
+      font-weight: bold;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px 10px;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -110px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 11px;
+      font-weight: normal;
+      line-height: 1.4;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    textarea, input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border-color);
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--text-main);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(43, 76, 126, 0.08);
+    }
+
+    textarea {
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    #groups { min-height: 95px; }
+    #result { min-height: 75px; color: var(--primary); font-weight: 600; }
+    #testText { min-height: 70px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .dist-inline-group { display: flex; gap: 6px; align-items: center; }
+    .dist-inline-group select { flex: 1; }
+    .dist-inline-group input {
+      width: 75px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-group { display: flex; gap: 10px; margin-top: 18px; }
+
+    button {
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: #fff;
+      flex: 1;
+    }
+    .primary:hover { background: var(--primary-hover); }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: var(--panel-bg);
+      color: var(--text-muted);
+    }
+
+    .split-box {
+      background: var(--warm-yellow-bg);
+      border: 1px solid var(--warm-yellow-border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .split-box .box-title {
+      margin: 0 0 8px 0;
+      color: var(--warm-accent);
+      font-weight: 700;
+      font-size: 12.5px;
+    }
+
+    .copy-row { display: flex; gap: 6px; margin-top: 4px; }
+    .copy-row input, .copy-row textarea {
+      background: #FFF;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .btn-copy-sm {
+      flex: none;
+      min-width: 65px;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-copy-sm:hover { background: var(--primary-hover); }
+
+    .btn-copy-warm {
+      flex: none;
+      min-width: 120px;
+      background: var(--warm-accent);
+      color: #fff;
+    }
+    .btn-copy-warm:hover { background: var(--warm-accent-hover); }
+
+    .copied {
+      background: var(--success) !important;
+      color: #fff !important;
+    }
+
+    .test-box { margin-top: 14px; }
+
+    .match-success {
+      background: var(--success-bg);
+      border: 1px solid rgba(40, 167, 69, 0.3);
+      padding: 8px 12px;
+      margin-top: 8px;
+      border-radius: 6px;
+      color: var(--success);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .match-fail {
+      background: var(--danger-bg);
+      border: 1px solid rgba(192, 72, 72, 0.3);
+      padding: 8px 12px;
+      margin-top: 8px;
+      border-radius: 6px;
+      color: var(--danger);
+      font-weight: 600;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 一鍵套用新手範例列 -->
+<div class="template-bar">
+  <span class="title">💡 快速試用範例：</span>
+  <button class="btn-template" onclick="loadTemplate('medical')">🛒 範例：電商違禁詞過濾</button>
+  <button class="btn-template" onclick="loadTemplate('clear')" style="margin-left: auto; color: var(--danger);">🧹 清空內容</button>
+</div>
+
+<div class="container">
+  <!-- 左側：輸入條件區 -->
+  <div class="card">
+    <div class="card-header">
+      <h2>⚙️ 設定關鍵字條件</h2>
+      <span id="comboCounter" class="status-badge">0 組組合</span>
+    </div>        
+    
+    <label>
+      必須出現的關鍵字
+      <span class="sub-hint">換行即下一組條件；同列用「|」表示「或」</span>
+    </label>
+    <textarea id="groups" placeholder="例如：&#10;開口器&#10;美白|潔牙 (代表需同時包含『開口器』以及『美白或潔牙』)" oninput="handleSettingInput()"></textarea>
+
+    <label>
+      排除的關鍵字 (不可以出現)
+      <span class="sub-hint">多個詞請以「|」分隔</span>
+    </label>
+    <input id="exclude" value="寵物|毛孩|犬|狗|美白|t\s*型" placeholder="例如：寵物|毛孩|二手 (代表內文有這些字就不算)" oninput="handleSettingInput()">
+
+    <div class="row">
+      <div>
+        <label>
+          前後順序要求
+          <span class="tooltip">ⓘ
+            <span class="tooltiptext">【任意順序】：文字前後出現皆可。<br>【依序比對】：條件一必須出現在條件二前面。</span>
+          </span>
+        </label>
+        <select id="orderMode" onchange="handleSettingInput()">
+          <option value="anyOrder" selected>任意順序 (雙向皆可)</option>
+          <option value="directional">依序比對 (單向嚴格)</option>
+        </select>
+      </div>
+      <div>
+        <label>
+          關鍵字間隔距離
+          <span class="tooltip">ⓘ
+            <span class="tooltiptext">設定兩個關鍵字中間最多可夾帶多少個字。</span>
+          </span>
+        </label>
+        <div class="dist-inline-group">
+          <select id="distMode" onchange="toggleDistInput()">
+            <option value="limited" selected>限制字數 (N)</option>
+            <option value="unlimited">不限字數 (.*)</option>
+          </select>
+          <input id="distance" type="number" min="0" value="55" placeholder="字數" oninput="handleSettingInput()">
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="primary" onclick="generate()">⚡ 立即產生語法</button>
+    </div>
+  </div>
+
+  <!-- 右側：生成結果區 -->
+  <div class="card">
+    <div class="card-header">
+      <h2>📄 語法結果與測試</h2>
+      <span id="status" class="status-badge">準備就緒</span>
+    </div>        
+    
+    <!-- 拆分欄位區 (暖黃色面板) -->
+    <div class="split-box">
+      <div class="box-title">📊 專用表格拆分欄位</div>        
+      
+      <label style="margin-top:0;">正向條件 (Pattern1)</label>
+      <div class="copy-row">
+        <input id="posPattern" type="text" readonly placeholder="正向條件組合...">
+        <button class="btn-copy-sm" onclick="copyText('posPattern', this)">複製</button>
+      </div>
+
+      <label style="margin-top:8px;">排除條件 (NegPattern)</label>
+      <div class="copy-row">
+        <input id="negPattern" type="text" readonly placeholder="排除條件組合...">
+        <button class="btn-copy-sm" onclick="copyText('negPattern', this)">複製</button>
+      </div>
+    </div>
+
+    <!-- 完整 Regex 與複製按鈕 -->
+    <label style="margin-top:12px;">完整 Regex 語法</label>
+    <div class="copy-row">
+      <textarea id="result" placeholder="生成的語法將自動顯示於此..." oninput="testRegex()"></textarea>
+      <button class="btn-copy-warm" onclick="copyText('result', this)">📋 複製完整語法</button>
+    </div>
+
+    <!-- 即時測試區 -->
+    <div class="test-box">
+      <label>🧪 即時文案比對測試</label>
+      <textarea id="testText" placeholder="在此貼上您想測試的商品標題或文章段落..." oninput="handleTestInput()"></textarea>
+      <div id="testResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'keyword-regex-generator:v1';
+
+// 預設範例資料
+const TEMPLATES = {
+  medical: {
+    groups: '開口器\n牙齒|潔牙',
+    exclude: '寵物|毛孩|犬|狗|二手',
+    orderMode: 'anyOrder',
+    distMode: 'limited',
+    distance: 55,
+    testText: '這是一款好用的牙齒開口器，適合居家使用。'
+  }
+};
+
+function loadTemplate(key) {
+  if (key === 'clear') {
+    document.getElementById('groups').value = '';
+    document.getElementById('exclude').value = '';
+    document.getElementById('testText').value = '';
+  } else if (TEMPLATES[key]) {
+    const t = TEMPLATES[key];
+    document.getElementById('groups').value = t.groups;
+    document.getElementById('exclude').value = t.exclude;
+    document.getElementById('orderMode').value = t.orderMode;
+    document.getElementById('distMode').value = t.distMode;
+    document.getElementById('distance').value = t.distance;
+    document.getElementById('testText').value = t.testText;
+  }
+  toggleDistInput();
+  handleSettingInput();
+}
+
+function getState(){
+  return {
+    groups: document.getElementById('groups').value,
+    exclude: document.getElementById('exclude').value,
+    orderMode: document.getElementById('orderMode').value,
+    distMode: document.getElementById('distMode').value,
+    distance: document.getElementById('distance').value,
+    testText: document.getElementById('testText').value
+  };
+}
+
+function persistState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getState()));
+  } catch (e) {}
+}
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (!saved || typeof saved !== 'object') return;
+
+    if (typeof saved.groups === 'string') document.getElementById('groups').value = saved.groups;
+    if (typeof saved.exclude === 'string') document.getElementById('exclude').value = saved.exclude;
+    if (saved.orderMode === 'anyOrder' || saved.orderMode === 'directional') {
+      document.getElementById('orderMode').value = saved.orderMode;
+    }
+    if (saved.distMode === 'limited' || saved.distMode === 'unlimited') {
+      document.getElementById('distMode').value = saved.distMode;
+    }
+    if (typeof saved.distance === 'string' || typeof saved.distance === 'number') {
+      const distance = String(saved.distance);
+      if (/^\d+$/.test(distance)) document.getElementById('distance').value = distance;
+    }
+    if (typeof saved.testText === 'string') document.getElementById('testText').value = saved.testText;
+  } catch (e) {}
+}
+
+function handleSettingInput(){
+  persistState();
+  generate();
+}
+
+function handleTestInput(){
+  persistState();
+  testRegex();
+}
+
+function toggleDistInput(){
+  const mode = document.getElementById('distMode').value;
+  const distInput = document.getElementById('distance');
+  distInput.style.display = (mode === 'limited') ? 'block' : 'none';
+  persistState();
+  generate();
+}
+
+function parse(){
+  const raw = document.getElementById('groups').value.trim();
+  return raw ? raw.split(/\n+/).map(x=>x.trim()).filter(Boolean) : [];
+}
+
+function perms(a){
+  if(a.length<=1) return [a.slice()];
+  const out = [];
+  a.forEach((v,i) => perms(a.slice(0,i).concat(a.slice(i+1))).forEach(p => out.push([v].concat(p))));
+  return out;
+}
+
+function isPureEnglish(str) {
+  return /^[a-zA-Z0-9-]+$/.test(str.trim());
+}
+
+function gp(s){
+  const raw = s.trim();
+  if(!raw) return '';
+  if(raw.includes('(?')) return raw;
+
+  const parts = raw.split('|').map(p => p.trim()).filter(Boolean);
+  const allEnglish = parts.length > 0 && parts.every(isPureEnglish);
+
+  if(parts.length > 1){
+    const joined = parts.join('|');
+    return allEnglish ? `(?<![a-z])(${joined})(?![a-z])` : `(${joined})`;
+  } else {
+    if(allEnglish) return `(?<![a-z])(${raw})(?![a-z])`;
+    return raw.startsWith('(') ? raw : `(${raw})`;
+  }
+}
+
+function generate(){
+  persistState();
+  const gs = parse();
+  const excludeVal = document.getElementById('exclude').value.trim();
+  const orderMode = document.getElementById('orderMode').value;
+  const mode = document.getElementById('distMode').value;
+  const n = parseInt(document.getElementById('distance').value, 10);
+  const st = document.getElementById('status');
+  const r = document.getElementById('result');
+  const comboCounter = document.getElementById('comboCounter');
+
+  const posInput = document.getElementById('posPattern');
+  const negInput = document.getElementById('negPattern');
+
+  // 更新組合計數顯示
+  comboCounter.textContent = `${gs.length} 個條件階層`;
+
+  if(gs.length < 1 && !excludeVal){
+    st.textContent = '待輸入條件';
+    st.style.background = 'var(--panel-bg)';
+    st.style.color = 'var(--text-muted)';
+    r.value = '';
+    posInput.value = '';
+    negInput.value = '';
+    testRegex();
+    return;
+  }
+
+  let connector = '.*';
+  if(mode === 'limited'){
+    if(!Number.isInteger(n) || n < 0){
+      st.textContent = '數字格式錯誤';
+      st.style.background = 'var(--danger-bg)';
+      st.style.color = 'var(--danger)';
+      r.value = '';
+      return;
+    }
+    connector = '.{0,' + n + '}';
+  }
+
+  let coreRegex = '';
+  if(gs.length === 1){
+    coreRegex = gp(gs[0]);
+  } else if(gs.length > 1){
+    if(orderMode === 'directional'){
+      coreRegex = gs.map(gp).join(connector);
+    } else {
+      const arr = perms(gs).map(p => p.map(gp).join(connector));
+      const unique = [...new Set(arr)];
+      coreRegex = unique.join('|');
+    }
+  }
+
+  let posPatternValue = '';
+  if (coreRegex) {
+    posPatternValue = (orderMode === 'anyOrder' && gs.length > 1) ? `(${coreRegex})` : coreRegex;
+  }
+  posInput.value = posPatternValue;
+
+  let negPatternValue = excludeVal ? gp(excludeVal) : '';
+  negInput.value = negPatternValue;
+
+  let finalRegex = '';
+  if(!excludeVal){
+    finalRegex = coreRegex;
+  } else {
+    if(posPatternValue){
+      const cleanPos = posPatternValue.startsWith('(') && posPatternValue.endsWith(')') 
+        ? posPatternValue 
+        : `(${posPatternValue})`;
+      finalRegex = '^(?=.*' + cleanPos + ')';
+    } else {
+      finalRegex = '^';
+    }
+    
+    const cleanNeg = negPatternValue.startsWith('(') && negPatternValue.endsWith(')') 
+      ? negPatternValue 
+      : `(${negPatternValue})`;
+    finalRegex += '(?!.*' + cleanNeg + ')';
+  }
+
+  r.value = finalRegex;
+  st.textContent = '生成成功';
+  st.style.background = 'var(--success-bg)';
+  st.style.color = 'var(--success)';
+
+  testRegex();
+}
+
+// 視覺回饋複製功能 (取代傳統 alert)
+function copyText(id, btnElement){
+  const target = document.getElementById(id);
+  const val = target.value || target.textContent;
+  if(!val) return;
+
+  navigator.clipboard.writeText(val).then(() => {
+    const originalText = btnElement.textContent;
+    btnElement.textContent = '✓ 已複製';
+    btnElement.classList.add('copied');
+    setTimeout(() => {
+      btnElement.textContent = originalText;
+      btnElement.classList.remove('copied');
+    }, 1500);
+  });
+}
+
+function testRegex(){
+  const pattern = document.getElementById('result').value.trim();
+  const text = document.getElementById('testText').value;
+  const testRes = document.getElementById('testResult');
+
+  if(!pattern || !text.trim()){
+    testRes.innerHTML = '';
+    return;
+  }
+
+  try {
+    const regex = new RegExp(pattern, 'is');
+    const isMatch = regex.test(text);
+
+    if(isMatch){
+      testRes.innerHTML = '<div class="match-success">✅ 匹配成功：測試文本完全符合設定條件。</div>';
+    } else {
+      testRes.innerHTML = '<div class="match-fail">❌ 匹配失敗：文本不符合條件，或已被排除關鍵字過濾。</div>';
+    }
+  } catch(e) {
+    testRes.innerHTML = '<div class="match-fail">⚠️ 正則表達式語法有誤，請檢查條件設定。</div>';
+  }
+}
+
+// 初始化執行
+loadState();
+toggleDistInput();
+testRegex();
+</script>
+</body>
+</html>
