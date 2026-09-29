@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>關鍵字語法生成器 (新手友善版)</title>
+  <title>關鍵字語法生成器 (Smart 智慧連線終極版)</title>
   <style>
     :root {
       --bg-color: #FAF6E8;
@@ -22,6 +22,9 @@
       --success-bg: #E8F5E9;
       --danger: #C04848;
       --danger-bg: #FDF2F2;
+      --ai-purple: #6B46C1;
+      --ai-purple-hover: #553C9A;
+      --ai-bg: #F3E8FF;
     }
 
     * { box-sizing: border-box; }
@@ -48,7 +51,6 @@
       .container { grid-template-columns: 1fr; }
     }
 
-    /* 上方範例快速帶入區 */
     .template-bar {
       max-width: 1140px;
       margin: 0 auto 16px auto;
@@ -130,41 +132,41 @@
       font-size: 11.5px;
     }
 
-    /* 輕量 Tooltip 提示圖示 */
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-      color: var(--warm-accent);
-      margin-left: 4px;
-      font-weight: bold;
+    /* SMART 全自動智慧面板 */
+    .smart-ai-box {
+      background: var(--ai-bg);
+      border: 1px solid #D6BCFA;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+    }
+    
+    .smart-ai-box .ai-title {
+      font-weight: 700;
+      color: var(--ai-purple);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .tooltip .tooltiptext {
-      visibility: hidden;
-      width: 220px;
-      background-color: #333;
-      color: #fff;
-      text-align: left;
+    .ai-input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-ai {
+      background: var(--ai-purple);
+      color: white;
+      white-space: nowrap;
+      padding: 8px 14px;
+      border: none;
       border-radius: 6px;
-      padding: 8px 10px;
-      position: absolute;
-      z-index: 10;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -110px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      font-size: 11px;
-      font-weight: normal;
-      line-height: 1.4;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+      font-weight: 600;
     }
-
-    .tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
-    }
+    .btn-ai:hover { background: var(--ai-purple-hover); }
+    .btn-ai:disabled { background: #A0AEC0; cursor: not-allowed; }
 
     textarea, input, select {
       width: 100%;
@@ -310,7 +312,6 @@
 </head>
 <body>
 
-<!-- 一鍵套用新手範例列 -->
 <div class="template-bar">
   <span class="title">💡 快速試用範例：</span>
   <button class="btn-template" onclick="loadTemplate('medical')">🛒 範例：電商違禁詞過濾</button>
@@ -322,14 +323,29 @@
   <div class="card">
     <div class="card-header">
       <h2>⚙️ 設定關鍵字條件</h2>
-      <span id="comboCounter" class="status-badge">0 組組合</span>
-    </div>        
-    
+      <span id="comboCounter" class="status-badge">0 個條件階層</span>
+    </div>
+
     <label>
       必須出現的關鍵字
       <span class="sub-hint">換行即下一組條件；同列用「|」表示「或」</span>
     </label>
     <textarea id="groups" placeholder="例如：&#10;開口器&#10;美白|潔牙 (代表需同時包含『開口器』以及『美白或潔牙』)" oninput="handleSettingInput()"></textarea>
+
+    <!-- 🤖 關鍵字語法生成器 (Smart 全自動區塊) -->
+    <div class="smart-ai-box">
+      <div class="ai-title">🤖 關鍵字語法生成器 (Smart 全自動)</div>
+      <div style="margin-bottom: 8px;">
+        <input id="apiKey" type="password" placeholder="貼上 Smart Token (smart_...)" oninput="saveApiKey()" style="font-size: 11px; padding: 5px;">
+      </div>
+      <div class="ai-input-group">
+        <input id="aiKeyword" type="text" placeholder="輸入要拓展的詞 (例：毛滴蟲)" onkeydown="if(event.key==='Enter') expandKeywordWithSMART()">
+        <button id="aiBtn" class="btn-ai" onclick="expandKeywordWithSMART()">⚡ 自動生成並帶入</button>
+      </div>
+      <div id="aiStatus" class="sub-hint" style="margin-top: 6px; color: var(--ai-purple);">
+        輸入關鍵字點擊按鈕，系統自動呼叫 Smart 分析並直接寫入上方！
+      </div>
+    </div>
 
     <label>
       排除的關鍵字 (不可以出現)
@@ -339,24 +355,14 @@
 
     <div class="row">
       <div>
-        <label>
-          前後順序要求
-          <span class="tooltip">ⓘ
-            <span class="tooltiptext">【任意順序】：文字前後出現皆可。<br>【依序比對】：條件一必須出現在條件二前面。</span>
-          </span>
-        </label>
+        <label>前後順序要求</label>
         <select id="orderMode" onchange="handleSettingInput()">
           <option value="anyOrder" selected>任意順序 (雙向皆可)</option>
           <option value="directional">依序比對 (單向嚴格)</option>
         </select>
       </div>
       <div>
-        <label>
-          關鍵字間隔距離
-          <span class="tooltip">ⓘ
-            <span class="tooltiptext">設定兩個關鍵字中間最多可夾帶多少個字。</span>
-          </span>
-        </label>
+        <label>關鍵字間隔距離</label>
         <div class="dist-inline-group">
           <select id="distMode" onchange="toggleDistInput()">
             <option value="limited" selected>限制字數 (N)</option>
@@ -377,12 +383,11 @@
     <div class="card-header">
       <h2>📄 語法結果與測試</h2>
       <span id="status" class="status-badge">準備就緒</span>
-    </div>        
-    
-    <!-- 拆分欄位區 (暖黃色面板) -->
+    </div>
+
     <div class="split-box">
-      <div class="box-title">📊 專用表格拆分欄位</div>        
-      
+      <div class="box-title">📊 專用表格拆分欄位</div>
+
       <label style="margin-top:0;">正向條件 (Pattern1)</label>
       <div class="copy-row">
         <input id="posPattern" type="text" readonly placeholder="正向條件組合...">
@@ -396,14 +401,12 @@
       </div>
     </div>
 
-    <!-- 完整 Regex 與複製按鈕 -->
     <label style="margin-top:12px;">完整 Regex 語法</label>
     <div class="copy-row">
       <textarea id="result" placeholder="生成的語法將自動顯示於此..." oninput="testRegex()"></textarea>
       <button class="btn-copy-warm" onclick="copyText('result', this)">📋 複製完整語法</button>
     </div>
 
-    <!-- 即時測試區 -->
     <div class="test-box">
       <label>🧪 即時文案比對測試</label>
       <textarea id="testText" placeholder="在此貼上您想測試的商品標題或文章段落..." oninput="handleTestInput()"></textarea>
@@ -414,8 +417,8 @@
 
 <script>
 const STORAGE_KEY = 'keyword-regex-generator:v1';
+const API_KEY_STORAGE = 'smart_llm_api_key';
 
-// 預設範例資料
 const TEMPLATES = {
   medical: {
     groups: '開口器\n牙齒|潔牙',
@@ -426,6 +429,103 @@ const TEMPLATES = {
     testText: '這是一款好用的牙齒開口器，適合居家使用。'
   }
 };
+
+function saveApiKey() {
+  const key = document.getElementById('apiKey').value;
+  localStorage.setItem(API_KEY_STORAGE, key);
+}
+
+function loadApiKey() {
+  const key = localStorage.getItem(API_KEY_STORAGE);
+  if (key) document.getElementById('apiKey').value = key;
+}
+
+// 關鍵字語法生成器：核心全自動 API 呼叫邏輯
+async function expandKeywordWithSMART() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const keyword = document.getElementById('aiKeyword').value.trim();
+  const aiStatus = document.getElementById('aiStatus');
+  const aiBtn = document.getElementById('aiBtn');
+
+  if (!apiKey) {
+    alert('請先輸入 Smart Token！');
+    return;
+  }
+  if (!keyword) {
+    alert('請輸入要拓展的關鍵字！');
+    return;
+  }
+
+  aiBtn.disabled = true;
+  aiStatus.textContent = '⏳ 關鍵字語法生成器運作中，正在與 Smart 平台通訊...';
+
+  const promptText = `請幫我分析關鍵字：「${keyword}」。請回傳該詞彙的：1. 原始繁體詞 2. 簡體對應詞 3. 常用英文 4. 同義詞與常見俗稱。請務必嚴格只回傳一行字，並用「|」符號分隔所有詞彙，不要輸出任何額外解釋或標點。範例輸出：美白|美白|whitening|潔白|亮白`;
+
+  const requestPayload = {
+    model: "gpt-4o-mini",
+    messages: [{ role: "user", content: promptText }],
+    temperature: 0.2
+  };
+
+  const tryTargets = [
+    {
+      url: 'https://smart.shopee.io/openapi/v1/chat/completions',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }
+    },
+    {
+      url: 'https://corsproxy.io/?' + encodeURIComponent('https://smart.shopee.io/openapi/v1/chat/completions'),
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }
+    }
+  ];
+
+  let success = false;
+
+  for (let target of tryTargets) {
+    try {
+      const response = await fetch(target.url, {
+        method: 'POST',
+        headers: target.headers,
+        body: JSON.stringify(requestPayload)
+      });
+
+      if (!response.ok) continue;
+
+      const data = await response.json();
+      let resultString = '';
+
+      if (data.choices && data.choices[0]?.message?.content) {
+        resultString = data.choices[0].message.content.trim();
+      } else if (data.reply || data.output || data.result) {
+        resultString = (data.reply || data.output || data.result).trim();
+      }
+
+      if (resultString) {
+        resultString = resultString.replace(/[`"'']/g, '').trim();
+
+        const groupsTextarea = document.getElementById('groups');
+        if (groupsTextarea.value.trim().length > 0) {
+          groupsTextarea.value += '\n' + resultString;
+        } else {
+          groupsTextarea.value = resultString;
+        }
+
+        aiStatus.textContent = `✅ 成功自動帶入：「${resultString}」`;
+        document.getElementById('aiKeyword').value = '';
+        handleSettingInput();
+        success = true;
+        break;
+      }
+    } catch (e) {
+      console.warn('Attempt failed:', e);
+    }
+  }
+
+  if (!success) {
+    aiStatus.innerHTML = `<span style="color:var(--danger)">❌ 請求連線失敗，請檢查 Token 是否過期或有誤。</span>`;
+  }
+
+  aiBtn.disabled = false;
+}
 
 function loadTemplate(key) {
   if (key === 'clear') {
@@ -550,7 +650,6 @@ function generate(){
   const posInput = document.getElementById('posPattern');
   const negInput = document.getElementById('negPattern');
 
-  // 更新組合計數顯示
   comboCounter.textContent = `${gs.length} 個條件階層`;
 
   if(gs.length < 1 && !excludeVal){
@@ -625,7 +724,6 @@ function generate(){
   testRegex();
 }
 
-// 視覺回饋複製功能 (取代傳統 alert)
 function copyText(id, btnElement){
   const target = document.getElementById(id);
   const val = target.value || target.textContent;
@@ -666,7 +764,8 @@ function testRegex(){
   }
 }
 
-// 初始化執行
+// 初始化
+loadApiKey();
 loadState();
 toggleDistInput();
 testRegex();
