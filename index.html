@@ -1,9 +1,10 @@
+
 <!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>關鍵字語法生成器 (Smart 智慧連線終極版)</title>
+  <title>關鍵字語法生成器</title>
   <style>
     :root {
       --bg-color: #FAF6E8;
@@ -22,13 +23,8 @@
       --success-bg: #E8F5E9;
       --danger: #C04848;
       --danger-bg: #FDF2F2;
-      --ai-purple: #6B46C1;
-      --ai-purple-hover: #553C9A;
-      --ai-bg: #F3E8FF;
     }
-
     * { box-sizing: border-box; }
-    
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
       background-color: var(--bg-color);
@@ -38,7 +34,6 @@
       font-size: 13.5px;
       line-height: 1.5;
     }
-
     .container {
       max-width: 1140px;
       margin: 0 auto;
@@ -46,11 +41,9 @@
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-
     @media (max-width: 860px) {
       .container { grid-template-columns: 1fr; }
     }
-
     .template-bar {
       max-width: 1140px;
       margin: 0 auto 16px auto;
@@ -63,13 +56,11 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-    
     .template-bar .title {
       font-weight: 700;
       color: var(--primary);
       font-size: 13px;
     }
-
     .btn-template {
       background: var(--panel-bg);
       border: 1px solid var(--border-color);
@@ -86,7 +77,6 @@
       color: #fff;
       border-color: var(--primary);
     }
-
     .card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -96,7 +86,6 @@
       display: flex;
       flex-direction: column;
     }
-
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -105,7 +94,6 @@
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border-color);
     }
-
     h2 {
       font-size: 15px;
       font-weight: 700;
@@ -115,7 +103,6 @@
       align-items: center;
       gap: 8px;
     }
-
     label {
       font-weight: 600;
       margin: 12px 0 6px;
@@ -125,49 +112,43 @@
       font-size: 12.5px;
       color: var(--text-main);
     }
-
     .sub-hint {
       font-weight: normal;
       color: var(--text-muted);
       font-size: 11.5px;
     }
-
-    /* SMART 全自動智慧面板 */
-    .smart-ai-box {
-      background: var(--ai-bg);
-      border: 1px solid #D6BCFA;
-      border-radius: 8px;
-      padding: 12px;
-      margin: 10px 0;
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      color: var(--warm-accent);
+      margin-left: 4px;
+      font-weight: bold;
     }
-    
-    .smart-ai-box .ai-title {
-      font-weight: 700;
-      color: var(--ai-purple);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .ai-input-group {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-ai {
-      background: var(--ai-purple);
-      color: white;
-      white-space: nowrap;
-      padding: 8px 14px;
-      border: none;
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
       border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
+      padding: 8px 10px;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -110px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 11px;
+      font-weight: normal;
+      line-height: 1.4;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
-    .btn-ai:hover { background: var(--ai-purple-hover); }
-    .btn-ai:disabled { background: #A0AEC0; cursor: not-allowed; }
-
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
     textarea, input, select {
       width: 100%;
       padding: 9px 11px;
@@ -179,28 +160,23 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-
     textarea:focus, input:focus, select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(43, 76, 126, 0.08);
     }
-
     textarea {
       resize: vertical;
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
     }
-
     #groups { min-height: 95px; }
     #result { min-height: 75px; color: var(--primary); font-weight: 600; }
     #testText { min-height: 70px; }
-
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-top: 4px;
     }
-
     .dist-inline-group { display: flex; gap: 6px; align-items: center; }
     .dist-inline-group select { flex: 1; }
     .dist-inline-group input {
@@ -208,9 +184,7 @@
       text-align: center;
       transition: all 0.2s ease;
     }
-
     .btn-group { display: flex; gap: 10px; margin-top: 18px; }
-
     button {
       padding: 10px 14px;
       border: 0;
@@ -224,14 +198,12 @@
       align-items: center;
       gap: 6px;
     }
-
     .primary {
       background: var(--primary);
       color: #fff;
       flex: 1;
     }
     .primary:hover { background: var(--primary-hover); }
-
     .status-badge {
       font-size: 11px;
       font-weight: 600;
@@ -240,28 +212,24 @@
       background: var(--panel-bg);
       color: var(--text-muted);
     }
-
     .split-box {
       background: var(--warm-yellow-bg);
       border: 1px solid var(--warm-yellow-border);
       border-radius: 8px;
       padding: 14px;
     }
-
     .split-box .box-title {
       margin: 0 0 8px 0;
       color: var(--warm-accent);
       font-weight: 700;
       font-size: 12.5px;
     }
-
     .copy-row { display: flex; gap: 6px; margin-top: 4px; }
     .copy-row input, .copy-row textarea {
       background: #FFF;
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
       font-size: 12px;
     }
-
     .btn-copy-sm {
       flex: none;
       min-width: 65px;
@@ -271,7 +239,6 @@
       color: #fff;
     }
     .btn-copy-sm:hover { background: var(--primary-hover); }
-
     .btn-copy-warm {
       flex: none;
       min-width: 120px;
@@ -279,14 +246,11 @@
       color: #fff;
     }
     .btn-copy-warm:hover { background: var(--warm-accent-hover); }
-
     .copied {
       background: var(--success) !important;
       color: #fff !important;
     }
-
     .test-box { margin-top: 14px; }
-
     .match-success {
       background: var(--success-bg);
       border: 1px solid rgba(40, 167, 69, 0.3);
@@ -297,7 +261,6 @@
       font-weight: 600;
       font-size: 12px;
     }
-
     .match-fail {
       background: var(--danger-bg);
       border: 1px solid rgba(192, 72, 72, 0.3);
@@ -311,7 +274,6 @@
   </style>
 </head>
 <body>
-
 <div class="template-bar">
   <span class="title">💡 快速試用範例：</span>
   <button class="btn-template" onclick="loadTemplate('medical')">🛒 範例：電商違禁詞過濾</button>
@@ -323,29 +285,14 @@
   <div class="card">
     <div class="card-header">
       <h2>⚙️ 設定關鍵字條件</h2>
-      <span id="comboCounter" class="status-badge">0 個條件階層</span>
+      <span id="comboCounter" class="status-badge">0 組組合</span>
     </div>
-
+    
     <label>
       必須出現的關鍵字
       <span class="sub-hint">換行即下一組條件；同列用「|」表示「或」</span>
     </label>
     <textarea id="groups" placeholder="例如：&#10;開口器&#10;美白|潔牙 (代表需同時包含『開口器』以及『美白或潔牙』)" oninput="handleSettingInput()"></textarea>
-
-    <!-- 🤖 關鍵字語法生成器 (Smart 全自動區塊) -->
-    <div class="smart-ai-box">
-      <div class="ai-title">🤖 關鍵字語法生成器 (Smart 全自動)</div>
-      <div style="margin-bottom: 8px;">
-        <input id="apiKey" type="password" placeholder="貼上 Smart Token (smart_...)" oninput="saveApiKey()" style="font-size: 11px; padding: 5px;">
-      </div>
-      <div class="ai-input-group">
-        <input id="aiKeyword" type="text" placeholder="輸入要拓展的詞 (例：毛滴蟲)" onkeydown="if(event.key==='Enter') expandKeywordWithSMART()">
-        <button id="aiBtn" class="btn-ai" onclick="expandKeywordWithSMART()">⚡ 自動生成並帶入</button>
-      </div>
-      <div id="aiStatus" class="sub-hint" style="margin-top: 6px; color: var(--ai-purple);">
-        輸入關鍵字點擊按鈕，系統自動呼叫 Smart 分析並直接寫入上方！
-      </div>
-    </div>
 
     <label>
       排除的關鍵字 (不可以出現)
@@ -355,14 +302,24 @@
 
     <div class="row">
       <div>
-        <label>前後順序要求</label>
+        <label>
+          前後順序要求
+          <span class="tooltip">ⓘ
+            <span class="tooltiptext">【任意順序】：文字前後出現皆可。<br>【依序比對】：條件一必須出現在條件二前面。</span>
+          </span>
+        </label>
         <select id="orderMode" onchange="handleSettingInput()">
           <option value="anyOrder" selected>任意順序 (雙向皆可)</option>
           <option value="directional">依序比對 (單向嚴格)</option>
         </select>
       </div>
       <div>
-        <label>關鍵字間隔距離</label>
+        <label>
+          關鍵字間隔距離
+          <span class="tooltip">ⓘ
+            <span class="tooltiptext">設定兩個關鍵字中間最多可夾帶多少個字。</span>
+          </span>
+        </label>
         <div class="dist-inline-group">
           <select id="distMode" onchange="toggleDistInput()">
             <option value="limited" selected>限制字數 (N)</option>
@@ -387,7 +344,6 @@
 
     <div class="split-box">
       <div class="box-title">📊 專用表格拆分欄位</div>
-
       <label style="margin-top:0;">正向條件 (Pattern1)</label>
       <div class="copy-row">
         <input id="posPattern" type="text" readonly placeholder="正向條件組合...">
@@ -417,7 +373,6 @@
 
 <script>
 const STORAGE_KEY = 'keyword-regex-generator:v1';
-const API_KEY_STORAGE = 'smart_llm_api_key';
 
 const TEMPLATES = {
   medical: {
@@ -429,103 +384,6 @@ const TEMPLATES = {
     testText: '這是一款好用的牙齒開口器，適合居家使用。'
   }
 };
-
-function saveApiKey() {
-  const key = document.getElementById('apiKey').value;
-  localStorage.setItem(API_KEY_STORAGE, key);
-}
-
-function loadApiKey() {
-  const key = localStorage.getItem(API_KEY_STORAGE);
-  if (key) document.getElementById('apiKey').value = key;
-}
-
-// 關鍵字語法生成器：核心全自動 API 呼叫邏輯
-async function expandKeywordWithSMART() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  const keyword = document.getElementById('aiKeyword').value.trim();
-  const aiStatus = document.getElementById('aiStatus');
-  const aiBtn = document.getElementById('aiBtn');
-
-  if (!apiKey) {
-    alert('請先輸入 Smart Token！');
-    return;
-  }
-  if (!keyword) {
-    alert('請輸入要拓展的關鍵字！');
-    return;
-  }
-
-  aiBtn.disabled = true;
-  aiStatus.textContent = '⏳ 關鍵字語法生成器運作中，正在與 Smart 平台通訊...';
-
-  const promptText = `請幫我分析關鍵字：「${keyword}」。請回傳該詞彙的：1. 原始繁體詞 2. 簡體對應詞 3. 常用英文 4. 同義詞與常見俗稱。請務必嚴格只回傳一行字，並用「|」符號分隔所有詞彙，不要輸出任何額外解釋或標點。範例輸出：美白|美白|whitening|潔白|亮白`;
-
-  const requestPayload = {
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: promptText }],
-    temperature: 0.2
-  };
-
-  const tryTargets = [
-    {
-      url: 'https://smart.shopee.io/openapi/v1/chat/completions',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }
-    },
-    {
-      url: 'https://corsproxy.io/?' + encodeURIComponent('https://smart.shopee.io/openapi/v1/chat/completions'),
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }
-    }
-  ];
-
-  let success = false;
-
-  for (let target of tryTargets) {
-    try {
-      const response = await fetch(target.url, {
-        method: 'POST',
-        headers: target.headers,
-        body: JSON.stringify(requestPayload)
-      });
-
-      if (!response.ok) continue;
-
-      const data = await response.json();
-      let resultString = '';
-
-      if (data.choices && data.choices[0]?.message?.content) {
-        resultString = data.choices[0].message.content.trim();
-      } else if (data.reply || data.output || data.result) {
-        resultString = (data.reply || data.output || data.result).trim();
-      }
-
-      if (resultString) {
-        resultString = resultString.replace(/[`"'']/g, '').trim();
-
-        const groupsTextarea = document.getElementById('groups');
-        if (groupsTextarea.value.trim().length > 0) {
-          groupsTextarea.value += '\n' + resultString;
-        } else {
-          groupsTextarea.value = resultString;
-        }
-
-        aiStatus.textContent = `✅ 成功自動帶入：「${resultString}」`;
-        document.getElementById('aiKeyword').value = '';
-        handleSettingInput();
-        success = true;
-        break;
-      }
-    } catch (e) {
-      console.warn('Attempt failed:', e);
-    }
-  }
-
-  if (!success) {
-    aiStatus.innerHTML = `<span style="color:var(--danger)">❌ 請求連線失敗，請檢查 Token 是否過期或有誤。</span>`;
-  }
-
-  aiBtn.disabled = false;
-}
 
 function loadTemplate(key) {
   if (key === 'clear') {
@@ -764,8 +622,7 @@ function testRegex(){
   }
 }
 
-// 初始化
-loadApiKey();
+// 初始化執行
 loadState();
 toggleDistInput();
 testRegex();
