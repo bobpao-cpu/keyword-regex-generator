@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -70,6 +71,9 @@
       cursor: pointer;
       transition: all 0.2s;
       font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
     }
     .btn-template:hover {
       background: var(--primary);
@@ -276,7 +280,11 @@
 <div class="template-bar">
   <span class="title">💡 快速試用範例：</span>
   <button class="btn-template" onclick="loadTemplate('medical')">🛒 範例：電商違禁詞過濾</button>
-  <button class="btn-template" onclick="loadTemplate('clear')" style="margin-left: auto; color: var(--danger);">🧹 清空內容</button>
+  
+  <div style="margin-left: auto; display: flex; gap: 8px;">
+    <a href="https://datasuite.shopee.io/dashboard/dashboard/c15dda3e-fc06-4776-a40e-0156b354fe70/normal?page=1704800359783_41" target="_blank" class="btn-template" style="color: var(--primary);">🔗 開啟 Data Suite</a>
+    <button class="btn-template" onclick="loadTemplate('clear')" style="color: var(--danger);">🧹 清空內容</button>
+  </div>
 </div>
 
 <div class="container">
