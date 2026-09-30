@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>關鍵字語法生成幫手</title>
+  <title>關鍵字語法生成器</title>
   <style>
     :root {
       --bg-color: #FAF6E8;
@@ -248,13 +248,6 @@
       color: #fff;
     }
     .btn-copy-warm:hover { background: var(--warm-accent-hover); }
-    .btn-run-datasuite {
-      flex: none;
-      min-width: 150px;
-      background: var(--primary);
-      color: #fff;
-    }
-    .btn-run-datasuite:hover { background: var(--primary-hover); }
     .copied {
       background: var(--success) !important;
       color: #fff !important;
@@ -288,7 +281,6 @@
   <button class="btn-template" onclick="loadTemplate('medical')">🛒 範例：電商違禁詞過濾</button>
   
   <div style="margin-left: auto; display: flex; gap: 8px;">
-    <button class="btn-template" onclick="openDataSuiteWithRegex()" style="color: var(--primary);">🚀 帶入 Data Suite 撈取</button>
     <button class="btn-template" onclick="loadTemplate('clear')" style="color: var(--danger);">🧹 清空內容</button>
   </div>
 </div>
@@ -344,7 +336,7 @@
     </div>
 
     <div class="btn-group">
-      <button class="primary" onclick="generate()">⚡ 立即產生語法</button>
+      <button class="primary" onclick="generate()">⚡ 區域更新語法</button>
     </div>
   </div>
 
@@ -374,7 +366,6 @@
     <div class="copy-row">
       <textarea id="result" placeholder="生成的語法將自動顯示於此..." oninput="testRegex()"></textarea>
       <button class="btn-copy-warm" onclick="copyText('result', this)">📋 複製完整語法</button>
-      <button class="btn-run-datasuite" onclick="openDataSuiteWithRegex()">🚀 帶入 Data Suite 撈取</button>
     </div>
 
     <div class="test-box">
@@ -398,26 +389,6 @@ const TEMPLATES = {
     testText: '這是一款好用的牙齒開口器，適合居家使用。'
   }
 };
-
-// 透過 URL Hash 機制將語法帶給 Data Suite 頁面（避免跨網域沙盒阻擋）
-function openDataSuiteWithRegex() {
-  const resultTextarea = document.getElementById('result');
-  const regexValue = resultTextarea.value.trim();
-
-  if (!regexValue) {
-    alert('請先設定關鍵字條件並產生完整 Regex 語法！');
-    return;
-  }
-
-  // 目標 Data Suite 網址
-  const baseUrl = "https://datasuite.shopee.io/dashboard/dashboard/c15dda3e-fc06-4776-a40e-0156b354fe70/normal?page=1704800359783_41";
-  
-  // 將語法進行網址編碼後，以 #regex= 附加於 URL 末端
-  const targetUrl = baseUrl + "#regex=" + encodeURIComponent(regexValue);
-
-  // 開啟新分頁
-  window.open(targetUrl, '_blank');
-}
 
 function loadTemplate(key) {
   if (key === 'clear') {
@@ -524,7 +495,7 @@ function gp(s){
     return allEnglish ? `(?<![a-z])(${joined})(?![a-z])` : `(${joined})`;
   } else {
     if(allEnglish) return `(?<![a-z])(${raw})(?![a-z])`;
-    return raw.startsWith('(') ? raw : `(${raw})`;
+    return raw.startsWith(' me') ? raw : `(${raw})`;
   }
 }
 
