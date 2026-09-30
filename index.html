@@ -399,7 +399,7 @@ const TEMPLATES = {
   }
 };
 
-// 寫入 localStorage 並開啟 Data Suite
+// 觸發油猴跨網域事件並開啟 Data Suite
 function openDataSuiteWithRegex() {
   const resultTextarea = document.getElementById('result');
   const regexValue = resultTextarea.value.trim();
@@ -409,16 +409,14 @@ function openDataSuiteWithRegex() {
     return;
   }
 
-  // 1. 將語法寫入 localStorage (讓跨頁面的 Tampermonkey 腳本能存取)
-  try {
-    localStorage.setItem('auto_fill_combined_regex', regexValue);
-  } catch(e) {
-    console.error('快取寫入失敗:', e);
-  }
+  // 1. 發送自訂事件給 Tampermonkey 腳本補捉並寫入跨域存儲
+  window.dispatchEvent(new CustomEvent('SEND_REGEX_TO_TM', { detail: regexValue }));
 
-  // 2. 開啟目標 Data Suite 網址
-  const targetUrl = "https://datasuite.shopee.io/dashboard/dashboard/c15dda3e-fc06-4776-a40e-0156b354fe70/normal?page=1704800359783_41";
-  window.open(targetUrl, '_blank');
+  // 2. 延遲 100ms 確保事件被捕捉後再開啟 Data Suite 頁面
+  setTimeout(() => {
+    const targetUrl = "https://datasuite.shopee.io/dashboard/dashboard/c15dda3e-fc06-4776-a40e-0156b354fe70/normal?page=1704800359783_41";
+    window.open(targetUrl, '_blank');
+  }, 100);
 }
 
 function loadTemplate(key) {
